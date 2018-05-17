@@ -1,0 +1,73 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>ASL Prototype</title>
+	<script src="leap-0.6.4.js"></script>
+	<script src="https://js.leapmotion.com/leap-0.6.4.js"></script>
+</head>
+
+<body>
+	<p> sup </p>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r82/three.js"></script>
+<script src="https://js.leapmotion.com/leap-plugins-0.1.12.js"></script>
+<script src="OrbitControls.js"></script>
+
+<!-- This is the BoneHand Stuff -->
+<script type="text/javascript">
+	Leap.loop()
+	.use('boneHand', {
+		targetEl: document.body,
+		arm: false,
+		opacity: 1
+	});
+
+	var scene    = Leap.loopController.plugins.boneHand.scene;
+	var camera   = Leap.loopController.plugins.boneHand.camera;
+	var renderer = Leap.loopController.plugins.boneHand.renderer;
+	var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+	Leap.loopController.on('handFound', function(hand) {
+		document.querySelector('canvas').style.display = 'block';
+	}).on('handLost', function(hand){
+		if (Leap.loopController.frame(0).hands.length === 0){
+			document.querySelector('canvas').style.display = 'none';
+		}
+	});
+	// document.getElementById('view-source').href = "view-source:" + window.location.href
+</script>
+
+<script type="text/javascript">
+	Leap.loop(function(frame) {
+		frame.hands.forEach(function(hand, index) {
+			var numHands = frame.hands.length; 
+			
+			if(numHands ==2){
+
+				var handOne = frame.hands[0];
+				var handTwo = frame.hands[1];
+				var horizHandOne = handOne.direction[1]; //hand's orientation according 2 y-axis
+				var horizHandTwo = handTwo.direction[1];
+				var handSpeedOne = handOne.palmVelocity[1];  //handSpeed in the y direction (verticle)
+				var handSpeedTwo = handTwo.palmVelocity[1]; 
+
+
+				if((horizHandOne < 0.8 && horizHandOne > -0.5) && (horizHandTwo < 0.8 && horizHandTwo > -0.5)){  //Makes sure palms are flat
+					if((handSpeedOne > 100 && handSpeedTwo < -100) || (handSpeedTwo > 100 && handSpeedOne < -100)) {//ensures hands moving in opposite y direction
+						 console.log("moving!!!");
+					}
+				}
+			}
+
+			// if(hand.grabStrength > .9){
+			// console.log("inside grabstrength")
+			// document.querySelector('canvas').style.display = 'none';
+
+
+			});
+	}).use('screenPosition', {scale: 0.25});
+
+</script>
+ 
+
+</html>
